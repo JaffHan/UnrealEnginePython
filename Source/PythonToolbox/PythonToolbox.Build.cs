@@ -2,12 +2,12 @@
 
 namespace UnrealBuildTool.Rules
 {
-    public class PythonEditor : ModuleRules
+    public class PythonToolbox : ModuleRules
     {
 #if WITH_FORWARDED_MODULE_RULES_CTOR
-        public PythonEditor(ReadOnlyTargetRules Target) : base(Target)
+        public PythonToolbox(ReadOnlyTargetRules Target) : base(Target)
 #else
-        public PythonEditor(TargetInfo Target)
+        public PythonToolbox(TargetInfo Target)
 #endif
         {
 
@@ -17,6 +17,7 @@ namespace UnrealBuildTool.Rules
 
             PrivateIncludePaths.AddRange(
                 new string[] {
+                    "PythonToolbox/Private",
                     "PythonEditor/Private",
                 }
                 );
@@ -26,6 +27,7 @@ namespace UnrealBuildTool.Rules
                 {
                     "Core",
                     "CoreUObject",
+                    "Engine",
                     "SlateCore",
                     "Slate",
                     "AssetTools",
@@ -38,7 +40,8 @@ namespace UnrealBuildTool.Rules
                     "LevelEditor",
                     "Projects",
                     "UnrealEnginePython",
-                    "PythonEditor"
+                    "PythonEditor",
+                    "XmlParser"
                 }
                 );
         }

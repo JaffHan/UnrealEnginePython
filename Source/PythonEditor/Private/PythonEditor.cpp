@@ -30,7 +30,7 @@ public:
 
 				return FGlobalTabmanager::Get()->GetMajorTabForTabManager(NewPythonProjectEditor->GetTabManager().ToSharedRef()).ToSharedRef();
 			}
-
+			
 			static void OpenPythonEditor()
 			{
 				SpawnPythonEditorTab(FSpawnTabArgs(TSharedPtr<SWindow>(), FTabId()));	
@@ -38,35 +38,50 @@ public:
 
 			static void ExtendMenu(class FMenuBuilder& MenuBuilder)
 			{
+				MenuBuilder.BeginSection(FName("Developer"),FText::FromString("Developer"));
+				//MenuBuilder.AddMenuSeparator(FName("Developer"));
 				MenuBuilder.AddMenuEntry
 				(
-					LOCTEXT( "PythonEditorTabTitle", "Python Editor" ),
-					LOCTEXT( "PythonEditorTooltipText", "Open the Python Editor tab." ),
+					LOCTEXT( "PythonEditorTitle", "Python Editor" ),
+					LOCTEXT( "PythonEditorTooltip", "Open Python Editor." ),
 					FSlateIcon(FPythonEditorStyle::Get().GetStyleSetName(), "PythonEditor.TabIcon"),
 					FUIAction
 					(
 						FExecuteAction::CreateStatic(&Local::OpenPythonEditor)
 					)
 				);
+				MenuBuilder.EndSection();
+			}
+			static void ExtendMenuBar(FMenuBarBuilder& Builder)
+			{
+				Builder.AddPullDownMenu(FText::FromString("Python"), FText::FromString("Open Python Menu"), FNewMenuDelegate::CreateStatic(&ExtendMenu));
 			}
 		};
 
+		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+		//jaffhan : add new menu "python"
 		Extender = MakeShareable(new FExtender());
-	
+
+		/*
 		// Add Python editor extension to main menu
 		Extender->AddMenuExtension(
-			"WindowLayout",
-			EExtensionHook::After,
-			TSharedPtr<FUICommandList>(),
-			FMenuExtensionDelegate::CreateStatic( &Local::ExtendMenu ) );
+		"WindowLayout",
+		EExtensionHook::After,
+		TSharedPtr<FUICommandList>(),
+		FMenuExtensionDelegate::CreateStatic( &Local::ExtendMenu ) );
+		*/
+		Extender->AddMenuBarExtension(
+			"Help", EExtensionHook::After, 
+			TSharedPtr<FUICommandList>(), 
+			FMenuBarExtensionDelegate::CreateStatic(&Local::ExtendMenuBar));
 
-		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender( Extender );
+		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(Extender);
 
 		// Register a tab spawner so that our tab can be automatically restored from layout files
 		FGlobalTabmanager::Get()->RegisterTabSpawner( PythonEditorTabName, FOnSpawnTab::CreateStatic( &Local::SpawnPythonEditorTab ) )
-				.SetDisplayName( LOCTEXT( "PythonEditorTabTitle", "Python Editor" ) )
-				.SetTooltipText( LOCTEXT( "PythonEditorTooltipText", "Open the Python Editor tab." ) )
+				.SetDisplayName( LOCTEXT( "PythonEditorTitle", "Python Editor" ) )
+				.SetTooltipText( LOCTEXT( "PythonEditorTooltip", "Open Python Editor." ) )
 				.SetIcon(FSlateIcon(FPythonEditorStyle::Get().GetStyleSetName(), "PythonEditor.TabIcon"));
 	}
 
